@@ -9,3 +9,55 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Instructor {
+  id               String    @id @unique @default(uuid())
+  name             String    @db.VarChar()
+  email            String    @unique @db.VarChar()
+  username         String    @unique @db.VarChar()
+  password         String    @db.VarChar()
+  password_recover String    @db.VarChar()
+  active           Boolean   @db.Boolean
+  monitors         Monitor[]
+  students         Student[]
+
+  @@map("instructors")
+}
+
+model Monitor {
+  id               String     @id @unique @default(uuid())
+  name             String     @db.VarChar()
+  email            String     @unique @db.VarChar()
+  username         String     @unique @db.VarChar()
+  password         String     @db.VarChar()
+  password_recover String     @db.VarChar()
+  active           Boolean    @db.Boolean
+  instructor       Instructor @relation(fields: [instructor_id], references: [id], onDelete: Cascade)
+  instructor_id    String
+
+  @@map("monitors")
+}
+
+model Student {
+  id              String     @id @unique @default(uuid())
+  name            String     @db.VarChar()
+  email           String     @unique @db.VarChar()
+  perception_flag String     @db.VarChar()
+  instructor      Instructor @relation(fields: [instructor_id], references: [id], onDelete: NoAction)
+  instructor_id   String
+  services        Service[]
+
+  @@map("students")
+}
+
+model Service {
+  id                   String  @id @unique @default(uuid())
+  content              String  @db.VarChar()
+  type                 String  @db.VarChar()
+  attendant_instructor String? @db.VarChar()
+  attendant_monitor    String? @db.VarChar()
+  student              Student @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  student_id           String
+
+  @@map("services")
+}
